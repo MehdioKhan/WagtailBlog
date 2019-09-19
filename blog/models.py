@@ -23,7 +23,6 @@ class BlogPage(RoutablePageMixin,Page):
 
     def get_context(self, request, *args, **kwargs):
         context = super(BlogPage, self).get_context(request, *args, **kwargs)
-        context['posts'] = self.posts
         context['blog_page'] = self
         context['search_type'] = getattr(self, 'search_type', "")
         context['search_term'] = getattr(self, 'search_term', "")
@@ -46,11 +45,11 @@ class BlogPage(RoutablePageMixin,Page):
             self.search_term = date_format(date(int(year),int(month),int(day)))
         return Page.serve(self,request,*args,**kwargs)
 
-    @route(r'^(\d{4})/(\d{2})/(\d{2})/(.+)$')
-    def posts_by_date_slug(self,request,year,month,day,slug,*args,**kwargs):
+    @route(r'^(\d{4})/(\d{2})/(\d{2})/(.+)/$')
+    def post_by_date_slug(self,request,year,month,day,slug,*args,**kwargs):
         post_page = self.get_posts().filter(slug=slug).first()
         if not post_page:
-            return Http404
+            raise Http404
         return Page.serve(post_page,request,*args,**kwargs)
 
 
