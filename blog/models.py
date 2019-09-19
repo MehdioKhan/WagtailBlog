@@ -32,7 +32,7 @@ class BlogPage(RoutablePageMixin,Page):
     def get_posts(self):
         return PostPage.objects.descendant_of(self).live().order_by('-date')
 
-    @route(r'^(\d{4}/$')
+    @route(r'^(\d{4})/$')
     @route(r'^(\d{4})/(\d{2})/$')
     @route(r'^(\d{4})/(\d{2})/(\d{2})/$')
     def posts_by_date(self,request,year,month=None,day=None,*args,**kwargs):
