@@ -1,6 +1,6 @@
 Personal blog based on [wagtail](https://github.com/wagtail/wagtail)
 
-###How to install
+### How to install
 
 
     git clone https://github.com/MehdioKhan/WagtailBlog
