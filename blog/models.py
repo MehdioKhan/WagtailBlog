@@ -4,7 +4,8 @@ from wagtail.core.fields import RichTextField
 from wagtail.admin.edit_handlers import FieldPanel,InlinePanel
 from wagtail.snippets.models import register_snippet
 from wagtail.snippets.edit_handlers import SnippetChooserPanel
-from modelcluster.models import ParentalManyToManyField,ParentalKey
+from wagtail.images.edit_handlers import ImageChooserPanel
+from modelcluster.models import ParentalKey
 from taggit.models import TaggedItemBase, Tag as TaggitTag
 from modelcluster.contrib.taggit import ClusterTaggableManager
 from wagtail.contrib.routable_page.models import RoutablePageMixin,route
@@ -55,10 +56,14 @@ class BlogPage(RoutablePageMixin,Page):
 
 class PostPage(Page):
     body = RichTextField(blank=True)
+    short_description = RichTextField(blank=True)
+    cover_image = models.ForeignKey('wagtailimages.Image',on_delete=models.SET_NULL,blank=True,null=True)
     date = models.DateTimeField(verbose_name="Post date",default=datetime.today)
     tags = ClusterTaggableManager(through='BlogPageTag', blank=True)
     content_panels = Page.content_panels + [
+        FieldPanel('short_description', classname='full'),
         FieldPanel('body', classname="full"),
+        ImageChooserPanel('cover_image'),
         InlinePanel('categories', label='category'),
         FieldPanel('tags'),
     ]
