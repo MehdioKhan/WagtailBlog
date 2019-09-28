@@ -1,0 +1,50 @@
+{% extends 'blog/base.html' %}
+{% load static wagtailcore_tags wagtailimages_tags blog_tags wagtailimages_tags %}
+
+<!-- Page Header -->
+{% block header %}
+  <header class="masthead" style="background-image: url('{% static "img/home-bg.jpg" %}')">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="site-heading">
+            <h1>{{ blog_page.title }}</h1>
+            <span class="subheading">{{ blog_page.description }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+{% endblock %}
+<!-- Main Content -->
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+          {% with blog_page.get_posts as posts %}
+            {% for post in posts %}
+                <div class="post-preview">
+                  <a href="{% post_date_url post blog_page %}">
+                    <h2 class="post-title">
+                        {{ post.title }}
+                    </h2>
+                    <h3 class="post-subtitle">
+                        {{ post.short_description|richtext }}
+                    </h3>
+                  </a>
+                  <p class="post-meta">{{ post.owner }}
+                    <a href="#">Start Bootstrap</a>
+                    {{ post.date }}</p>
+                </div>
+                <hr>
+            {% endfor %}
+          {% endwith %}
+        <!-- Pager -->
+        <div class="clearfix">
+          <a class="btn btn-primary float-right" href="#">Older Posts &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
