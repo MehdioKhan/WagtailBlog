@@ -24,6 +24,7 @@ class BlogPage(RoutablePageMixin,Page):
 
     def get_context(self, request, *args, **kwargs):
         context = super(BlogPage, self).get_context(request, *args, **kwargs)
+        context['posts'] = getattr(self,'posts',self.get_posts())
         context['blog_page'] = self
         context['search_type'] = getattr(self, 'search_type', "")
         context['search_term'] = getattr(self, 'search_term', "")
