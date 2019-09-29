@@ -54,6 +54,13 @@ class BlogPage(RoutablePageMixin,Page):
             raise Http404
         return Page.serve(post_page,request,*args,**kwargs)
 
+    @route(r'^tag/(?P<tag>[-\w]+)/$')
+    def post_by_tag(self, request, tag, *args, **kwargs):
+        self.search_type = 'tag'
+        self.search_term = tag
+        self.posts = self.get_posts().filter(tags__slug=tag)
+        return Page.serve(self, request, *args, **kwargs)
+
 
 class PostPage(Page):
     body = RichTextField(blank=True)
