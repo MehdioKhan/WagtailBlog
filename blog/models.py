@@ -74,6 +74,15 @@ class BlogPage(RoutablePageMixin,Page):
         self.posts = self.get_posts()
         return Page.serve(self,request,*args,**kwargs)
 
+    @route(r'^search/$')
+    def post_search(self,request,*args,**kwargs):
+        query = request.GET.get('q',None)
+        if query:
+            self.posts = self.get_posts().filter(body__contains=query)
+            self.search_type = 'search'
+            self.search_term = query
+        return Page.serve(self,request,*args,**kwargs)
+
 
 class PostPage(Page):
     body = RichTextField(blank=True)
