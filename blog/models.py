@@ -5,7 +5,7 @@ from wagtail.admin.edit_handlers import FieldPanel,InlinePanel
 from wagtail.snippets.models import register_snippet
 from wagtail.snippets.edit_handlers import SnippetChooserPanel
 from wagtail.images.edit_handlers import ImageChooserPanel
-from modelcluster.models import ParentalKey
+from modelcluster.models import ParentalKey,ParentalManyToManyField
 from taggit.models import TaggedItemBase, Tag as TaggitTag
 from modelcluster.contrib.taggit import ClusterTaggableManager
 from wagtail.contrib.routable_page.models import RoutablePageMixin,route
@@ -13,6 +13,7 @@ from django.utils.dateformat import DateFormat
 from django.utils.formats import date_format
 from datetime import date,datetime
 from django.http import Http404
+from django import forms
 
 
 class BlogPage(RoutablePageMixin,Page):
@@ -61,18 +62,26 @@ class BlogPage(RoutablePageMixin,Page):
         self.posts = self.get_posts().filter(tags__slug=tag)
         return Page.serve(self, request, *args, **kwargs)
 
+    @route(r'^category/(?P<category>[-\w]+)/$')
+    def post_by_category(self, request, category, *args, **kwargs):
+        self.search_type = 'category'
+        self.search_term = category
+        self.posts = self.get_posts().filter(categories__slug=category)
+        return Page.serve(self, request, *args, **kwargs)
+
 
 class PostPage(Page):
     body = RichTextField(blank=True)
     short_description = RichTextField(blank=True)
     cover_image = models.ForeignKey('wagtailimages.Image',on_delete=models.SET_NULL,blank=True,null=True)
     date = models.DateTimeField(verbose_name="Post date",default=datetime.today)
+    categories = ParentalManyToManyField('blog.BlogCategory', blank=True)
     tags = ClusterTaggableManager(through='BlogPageTag', blank=True)
     content_panels = Page.content_panels + [
         FieldPanel('short_description', classname='full'),
         FieldPanel('body', classname="full"),
         ImageChooserPanel('cover_image'),
-        InlinePanel('categories', label='category'),
+        FieldPanel('categories', widget=forms.CheckboxSelectMultiple),
         FieldPanel('tags'),
     ]
     settings_panels = Page.settings_panels + [
@@ -105,19 +114,6 @@ class BlogCategory(models.Model):
     class Meta:
         verbose_name = "Category"
         verbose_name_plural = "Categories"
-
-
-class PageCategory(models.Model):
-    page = ParentalKey('blog.PostPage', on_delete=models.CASCADE, related_name='categories')
-    blog_category = models.ForeignKey(
-        'blog.BlogCategory', on_delete=models.CASCADE, related_name='blog_pages')
-
-    panels = [
-        SnippetChooserPanel('blog_category'),
-    ]
-
-    class Meta:
-        unique_together = ('page', 'blog_category')
 
 
 class BlogPageTag(TaggedItemBase):
